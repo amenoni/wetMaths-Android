@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">wetmaths</string>
+    <string name="default_url">http://192.168.1.108:8000</string>
+
+    <string name="device_url">Device URL</string>
+    <string name="connect">Connect and search for games</string>
+    <string name="player_name">Player name</string>
+    <string name="your_name">Your name</string>
+    <string name="create_new_game">Create new game</string>
+    <string name="first_player">First player</string>
+    <string name="second_player">Second player</string>
+    <string name="third_player">Third player</string>
+    <string name="no_current_games">No games found</string>
+    <string name="game_id">Game ID</string>
+    <string name="enter_as_p2">Enter as Player 2</string>
+    <string name="enter_as_p3">Enter as Player 3</string>
+</resources>
