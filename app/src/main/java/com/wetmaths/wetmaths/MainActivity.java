@@ -1,5 +1,6 @@
 package com.wetmaths.wetmaths;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -37,10 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private Button mCreateNewGame;
     private Button mSetAsPlayer2;
     private Button mSetAsPlayer3;
-    private Firebase mFirebase;
+
     protected SpiceManager mSpiceManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
 
-    Game mGame;
+    private Game mGame;
+    private int mPlayerPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,24 +61,14 @@ public class MainActivity extends AppCompatActivity {
         mSetAsPlayer3 = (Button) findViewById(R.id.set_p3);
         mSetAsPlayer3.setOnClickListener(new SetPlayerAsButtonOnClickListener());
 
-        Firebase.setAndroidContext(this);
-        mFirebase = new Firebase("https://resplendent-torch-6152.firebaseio.com/");
+
+
 
 
         mSpiceManager.start(this);
 
 
-        mFirebase.child("mensaje").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Toast.makeText(getApplicationContext(), "Valor: " + dataSnapshot.getValue(), Toast.LENGTH_SHORT).show();
-            }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
 
         mPerformRequestbtn.setOnClickListener(new ConnectButtonOnClicListener());
         mCreateNewGame.setOnClickListener(new CreateGameButtonOnClickListener());
@@ -165,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 mGame.setStatus("n");
                 mGame.setPlayer1(mPlayerName.getText().toString());
 
+                mPlayerPosition = 1;
+
                 CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
                 mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
             }else {
@@ -177,8 +171,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
            if(v.getId() == R.id.set_p2){
+               mPlayerPosition = 2;
                mGame.setPlayer2(mPlayerName.getText().toString());
            }else if(v.getId() == R.id.set_p3){
+               mPlayerPosition = 3;
                mGame.setPlayer3(mPlayerName.getText().toString());
            }
             CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
@@ -196,7 +192,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onRequestSuccess(Boolean result) {
             if (result){
-                //TODO Here we must start the game activity
+                //Start game activity
+                GameActivity gameActivity = new GameActivity();
+                Intent gameIntent = gameActivity.newIntent(getApplicationContext(),mGame,mPlayerName.getText().toString(),mPlayerPosition);
+                startActivity(gameIntent);
+
             }else {
                 Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
             }

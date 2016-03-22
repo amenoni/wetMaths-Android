@@ -59,7 +59,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Player 1 Score"
+            android:text="Score"
             android:textSize="15dp"
             android:id="@+id/scorePlayer1"
             android:layout_weight="1"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
-            android:text="Player 2 Score"
+            android:text="Score"
             android:id="@+id/scorePlayer2"
             android:layout_weight="1"
             android:textAlignment="center"
@@ -82,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
-            android:text="Player 3 Score"
+            android:text="Score"
             android:id="@+id/scorePlayer3"
             android:layout_weight="1"
             android:textAlignment="center"
@@ -120,7 +120,7 @@
             android:id="@+id/firstOperand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="60dp"
+            android:textSize="50dp"
             android:text="5"
             android:layout_marginRight="10dp"/>
 
@@ -128,7 +128,7 @@
             android:id="@+id/symbol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="60dp"
+            android:textSize="50dp"
             android:layout_marginRight="10dp"
             android:text="x"/>
 
@@ -136,14 +136,14 @@
             android:id="@+id/secondOperand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="60dp"
+            android:textSize="50dp"
             android:layout_marginRight="10dp"
             android:text="2"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="60dp"
+            android:textSize="50dp"
             android:layout_marginRight="10dp"
             android:text="="/>
 
@@ -151,7 +151,7 @@
             android:id="@+id/result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="60dp"
+            android:textSize="50dp"
             android:text="10"/>
 
     </LinearLayout>
@@ -177,7 +177,7 @@
         android:id="@+id/keypad1"
         android:layout_below="@+id/Layout_send"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:weightSum="3">
         <Button
             android:layout_width="wrap_content"
