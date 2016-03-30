@@ -6,14 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-
+import org.json.JSONArray;
 import org.json.JSONObject;
+
 
 public class GameActivity extends AppCompatActivity {
     private static final String TAG = "GameActivity";
@@ -56,7 +55,7 @@ public class GameActivity extends AppCompatActivity {
         Firebase.setAndroidContext(this);
         mFirebase = new Firebase("https://resplendent-torch-6152.firebaseio.com/");
 
-        mFirebase.child("game_"+ String.valueOf(mGameId)).addValueEventListener(new gameValueEventListener());
+        mFirebase.child("game_" + String.valueOf(mGameId)).addValueEventListener(new gameValueEventListener());
 
         mNamePlayer1 = (TextView) findViewById(R.id.namePlayer1);
         mNamePlayer2 = (TextView) findViewById(R.id.namePlayer2);
@@ -82,6 +81,8 @@ public class GameActivity extends AppCompatActivity {
             //String FirstKey = dataSnapshot.getKey();
             //String FirstValue = dataSnapshot.getValue().toString();
 
+            Log.d(TAG,"New Message recived");
+
             if(dataSnapshot.hasChildren()){
                 Iterable<DataSnapshot> childrens = dataSnapshot.getChildren();
                 for (DataSnapshot children : childrens){
@@ -90,19 +91,25 @@ public class GameActivity extends AppCompatActivity {
                     Log.d(TAG,"Children KEY " +ChildrenKey);
                     //aca tiene que estar el objeto formateado en json
                     String ChildrenValue = children.getValue().toString();
-                    Log.d(TAG,"Children VALUE " + ChildrenValue);
+                    Log.d(TAG, "Children VALUE " + ChildrenValue);
+
+                    //second level of childrens
+                    for(DataSnapshot secondChild : children.getChildren()){
+                        Log.d(TAG, "Second Children Key" + secondChild.getKey());
+                        Log.d(TAG, "Second Children Value" + secondChild.getValue());
+                        try {
+                            JSONArray jsonArray = new JSONArray(secondChild.getValue().toString());
+                            JSONObject object = jsonArray.getJSONObject(0);
+                            JSONObject gameJson = (JSONObject) object.get("fields");
+                            ProcessGameUpdate(gameJson);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
 
                 }
             }
-
-
-            /*try {
-                JSONObject jsonObject = new JSONObject(dataSnapshot.getValue().toString());
-                jsonObject.get("pk");
-            }catch (Exception e){
-                Log.e(TAG,e.getMessage());
-            }*/
-
 
 
         }
@@ -111,6 +118,20 @@ public class GameActivity extends AppCompatActivity {
         public void onCancelled(FirebaseError firebaseError) {
 
         }
+    }
+
+
+    private void ProcessGameUpdate(JSONObject gameJson){
+
+        Game recivedGame = new Game(gameJson);
+        mNamePlayer1.setText(recivedGame.getPlayer1());
+        mNamePlayer2.setText(recivedGame.getPlayer2());
+        mNamePlayer3.setText(recivedGame.getPlayer3());
+
+        if(recivedGame.getStatus().equals(Game.STATUS_FINISHED)){
+            this.finish();
+        }
+
     }
 
 }

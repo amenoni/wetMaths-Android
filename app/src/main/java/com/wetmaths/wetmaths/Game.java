@@ -2,8 +2,10 @@ package com.wetmaths.wetmaths;
 
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +18,12 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
 
+    private final static String TAG = "Game";
+
+    public final static String STATUS_FINISHED = "f";
+    public final static String STATUS_NOT_STARTED = "n";
+    public final static String STATUS_STARTED = "s";
+
     private int id;
     private String player1;
     private String player2;
@@ -25,6 +33,25 @@ public class Game {
     private String status;
     private String winner;
 
+
+    public Game(){
+
+    }
+
+    public Game(JSONObject gameJson) {
+        try {
+            this.setPlayer1(gameJson.getString("player1"));
+            this.setPlayer2(gameJson.getString("player2"));
+            this.setPlayer3(gameJson.getString("player3"));
+            this.setStarted_at(gameJson.getString("started_at"));
+            this.setEnded_at(gameJson.getString("ended_at"));
+            this.setWinner(gameJson.getString("winner"));
+            this.setStatus(gameJson.getString("status"));
+
+        }catch (Exception e){
+            Log.e(TAG,e.getMessage());
+        }
+    }
 
     public int getId() {
         return id;
@@ -128,4 +155,5 @@ public class Game {
 
         return map;
     }
+
 }
