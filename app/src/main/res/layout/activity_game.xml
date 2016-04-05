@@ -102,7 +102,7 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textSize="30dp"
-            android:text="10"/>
+            android:text="-"/>
     </LinearLayout>
 
 
@@ -121,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="50dp"
-            android:text="5"
+            android:text="-"
             android:layout_marginRight="10dp"/>
 
         <TextView
@@ -138,7 +138,7 @@
             android:layout_height="wrap_content"
             android:textSize="50dp"
             android:layout_marginRight="10dp"
-            android:text="2"/>
+            android:text="-"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -152,7 +152,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="50dp"
-            android:text="10"/>
+            android:text="-"/>
 
     </LinearLayout>
 
@@ -165,10 +165,21 @@
         android:layout_marginTop="10dp"
         >
         <Button
+            android:id="@+id/send"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Send"
-            android:background="@color/green"/>
+            android:background="@color/green"
+            android:enabled="false"
+            android:visibility="gone"/>
+        <Button
+            android:id="@+id/start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start!"
+            android:background="@color/green"
+            android:enabled="false"
+            android:visibility="visible"/>/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

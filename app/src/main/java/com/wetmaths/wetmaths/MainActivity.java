@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                 mGame = game;
                 //Start game activity
                 GameActivity gameActivity = new GameActivity();
-                Intent gameIntent = gameActivity.newIntent(getApplicationContext(), mGame, mPlayerName.getText().toString(), mPlayerPosition);
+                Intent gameIntent = gameActivity.newIntent(getApplicationContext(), mGame, mPlayerName.getText().toString(), mPlayerPosition,mDeviceUrl.getText().toString());
                 startActivity(gameIntent);
             }
 

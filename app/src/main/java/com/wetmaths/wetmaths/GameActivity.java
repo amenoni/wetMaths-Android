@@ -5,11 +5,23 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.octo.android.robospice.JacksonSpringAndroidSpiceService;
+import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
+import com.wetmaths.wetmaths.io.network.CurrentGamePostRequest;
+import com.wetmaths.wetmaths.io.network.CurrentGamePutRequest;
+import com.wetmaths.wetmaths.io.network.CurrentGameRequest;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,25 +32,33 @@ public class GameActivity extends AppCompatActivity {
     private static final String GAME_ID_EXTRA = "gameId";
     private static final String PLAYER_POSITION_EXTRA = "playerPosition";
     private static final String PLAYER_NAME_EXTRA = "playerName";
+    private static final String DEVICE_URL_EXTRA = "deviceURL";
 
     private Firebase mFirebase;
 
+    protected SpiceManager mSpiceManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
 
     private TextView mNamePlayer1;
     private TextView mNamePlayer2;
     private TextView mNamePlayer3;
+    private Button mStartButton;
+    private Button mSendButton;
 
     private String mPlayerName;
     private int mGameId;
     private int mPlayerPosition;
+    private String mDeviceURL;
+    private Game mGame;
+    private String mCurrentStatus = Game.STATUS_NOT_STARTED;
 
 
 
-    public Intent newIntent (Context context,Game game, String playerName, int playerPosition){
+    public Intent newIntent (Context context,Game game, String playerName, int playerPosition,String deviceURL){
         Intent intent = new Intent(context,GameActivity.class);
         intent.putExtra(GAME_ID_EXTRA, game.getId() );
         intent.putExtra(PLAYER_POSITION_EXTRA,playerPosition);
         intent.putExtra(PLAYER_NAME_EXTRA,playerName);
+        intent.putExtra(DEVICE_URL_EXTRA,deviceURL);
         return intent;
     }
 
@@ -51,6 +71,9 @@ public class GameActivity extends AppCompatActivity {
         mPlayerName = bundle.getString(PLAYER_NAME_EXTRA);
         mGameId = bundle.getInt(GAME_ID_EXTRA);
         mPlayerPosition = bundle.getInt(PLAYER_POSITION_EXTRA);
+        mDeviceURL = bundle.getString(DEVICE_URL_EXTRA);
+
+        mSpiceManager.start(this);
 
         Firebase.setAndroidContext(this);
         mFirebase = new Firebase("https://resplendent-torch-6152.firebaseio.com/");
@@ -60,6 +83,11 @@ public class GameActivity extends AppCompatActivity {
         mNamePlayer1 = (TextView) findViewById(R.id.namePlayer1);
         mNamePlayer2 = (TextView) findViewById(R.id.namePlayer2);
         mNamePlayer3 = (TextView) findViewById(R.id.namePlayer3);
+        mStartButton = (Button) findViewById(R.id.start);
+        mSendButton = (Button) findViewById(R.id.send);
+
+
+        mStartButton.setOnClickListener(new StartGameOnClickListener());
 
         switch (mPlayerPosition){
             case 1:
@@ -101,6 +129,7 @@ public class GameActivity extends AppCompatActivity {
                             JSONArray jsonArray = new JSONArray(secondChild.getValue().toString());
                             JSONObject object = jsonArray.getJSONObject(0);
                             JSONObject gameJson = (JSONObject) object.get("fields");
+                            gameJson.put("pk",object.get("pk"));
                             ProcessGameUpdate(gameJson);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -122,16 +151,61 @@ public class GameActivity extends AppCompatActivity {
 
 
     private void ProcessGameUpdate(JSONObject gameJson){
+        mGame = new Game(gameJson);
+        mNamePlayer1.setText(mGame.getPlayer1());
+        mNamePlayer2.setText(mGame.getPlayer2());
+        mNamePlayer3.setText(mGame.getPlayer3());
 
-        Game recivedGame = new Game(gameJson);
-        mNamePlayer1.setText(recivedGame.getPlayer1());
-        mNamePlayer2.setText(recivedGame.getPlayer2());
-        mNamePlayer3.setText(recivedGame.getPlayer3());
-
-        if(recivedGame.getStatus().equals(Game.STATUS_FINISHED)){
+        if(mGame.getStatus().equals(Game.STATUS_FINISHED)){
             this.finish();
+        }else if (mCurrentStatus.equals(Game.STATUS_NOT_STARTED)){
+            //I am the first player?
+            if(mPlayerName.equals(mGame.getPlayer1())){
+                mSendButton.setVisibility(View.GONE);
+                mStartButton.setVisibility(View.VISIBLE);
+                if(!mGame.getPlayer2().equals("null") && !mGame.getPlayer3().equals("null") && !mGame.getPlayer2().isEmpty() && !mGame.getPlayer3().isEmpty()){
+                    mStartButton.setEnabled(true);
+                }
+            }else {
+                mStartButton.setVisibility(View.GONE);
+                mSendButton.setVisibility(View.VISIBLE);
+                mSendButton.setEnabled(false);
+            }
         }
 
+
+        //GAME STARTED RECIVED!!
+        if(mCurrentStatus.equals(Game.STATUS_NOT_STARTED) && mGame.getStatus().equals(Game.STATUS_STARTED)){
+            mStartButton.setVisibility(View.GONE);
+            mSendButton.setVisibility(View.VISIBLE);
+            mSendButton.setEnabled(true);
+            mCurrentStatus = Game.STATUS_STARTED;
+        }
+
+
+    }
+
+
+    private class StartGameOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            mGame.setStatus(Game.STATUS_STARTED);
+            CurrentGamePutRequest currentGamePutRequest = new CurrentGamePutRequest(mDeviceURL,mGame);
+            mSpiceManager.execute(currentGamePutRequest, new GamesPutRequestListener());
+        }
+    }
+
+
+    private class GamesPutRequestListener implements RequestListener<Boolean> {
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            Toast.makeText(getApplicationContext(), "Request faliure", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onRequestSuccess(Boolean result) {
+
+        }
     }
 
 }
