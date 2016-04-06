@@ -18,6 +18,7 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.wetmaths.wetmaths.io.network.CurrentGamePostRequest;
+import com.wetmaths.wetmaths.io.network.CurrentGamePutRequest;
 import com.wetmaths.wetmaths.io.network.CurrentGameRequest;
 import com.wetmaths.wetmaths.io.network.GameListRequest;
 
@@ -123,9 +124,10 @@ public class MainActivity extends AppCompatActivity {
                mPlayerPosition = 3;
                mGame.setPlayer3(mPlayerName.getText().toString());
            }
-            CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
-            mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
-
+            //CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
+            //mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
+            CurrentGamePutRequest currentGamePutRequest = new CurrentGamePutRequest(mDeviceUrl.getText().toString(),mGame);
+            mSpiceManager.execute(currentGamePutRequest,new GamesPostRequestListener());
         }
     }
 

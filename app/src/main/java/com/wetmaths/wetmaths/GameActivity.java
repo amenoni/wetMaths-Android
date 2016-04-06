@@ -2,6 +2,7 @@ package com.wetmaths.wetmaths;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.wetmaths.wetmaths.io.network.CurrentGameRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.Random;
 
 
 public class GameActivity extends AppCompatActivity {
@@ -41,8 +43,23 @@ public class GameActivity extends AppCompatActivity {
     private TextView mNamePlayer1;
     private TextView mNamePlayer2;
     private TextView mNamePlayer3;
+    private TextView mFirstOperand;
+    private TextView mSecondOperand;
+    private TextView mTimer;
+    private TextView mResult;
     private Button mStartButton;
     private Button mSendButton;
+    private Button mPad0;
+    private Button mPad1;
+    private Button mPad2;
+    private Button mPad3;
+    private Button mPad4;
+    private Button mPad5;
+    private Button mPad6;
+    private Button mPad7;
+    private Button mPad8;
+    private Button mPad9;
+    private Button mBack;
 
     private String mPlayerName;
     private int mGameId;
@@ -51,7 +68,10 @@ public class GameActivity extends AppCompatActivity {
     private Game mGame;
     private String mCurrentStatus = Game.STATUS_NOT_STARTED;
 
+    private Handler mTimeHandler;
+    private Runnable mTimerRunable;
 
+    private PadButtonOnClickListener mPadButtonOnClickListener = new PadButtonOnClickListener();
 
     public Intent newIntent (Context context,Game game, String playerName, int playerPosition,String deviceURL){
         Intent intent = new Intent(context,GameActivity.class);
@@ -61,6 +81,9 @@ public class GameActivity extends AppCompatActivity {
         intent.putExtra(DEVICE_URL_EXTRA,deviceURL);
         return intent;
     }
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +95,26 @@ public class GameActivity extends AppCompatActivity {
         mGameId = bundle.getInt(GAME_ID_EXTRA);
         mPlayerPosition = bundle.getInt(PLAYER_POSITION_EXTRA);
         mDeviceURL = bundle.getString(DEVICE_URL_EXTRA);
+        mNamePlayer1 = (TextView) findViewById(R.id.namePlayer1);
+        mNamePlayer2 = (TextView) findViewById(R.id.namePlayer2);
+        mNamePlayer3 = (TextView) findViewById(R.id.namePlayer3);
+        mFirstOperand = (TextView) findViewById(R.id.firstOperand);
+        mSecondOperand = (TextView) findViewById(R.id.secondOperand);
+        mTimer = (TextView) findViewById(R.id.timer);
+        mResult = (TextView) findViewById(R.id.result);
+        mStartButton = (Button) findViewById(R.id.start);
+        mSendButton = (Button) findViewById(R.id.send);
+        mPad0 = (Button) findViewById(R.id.zero);
+        mPad1 = (Button) findViewById(R.id.one);
+        mPad2 = (Button) findViewById(R.id.two);
+        mPad3 = (Button) findViewById(R.id.three);
+        mPad4 = (Button) findViewById(R.id.four);
+        mPad5 = (Button) findViewById(R.id.five);
+        mPad6 = (Button) findViewById(R.id.six);
+        mPad7 = (Button) findViewById(R.id.seven);
+        mPad8 = (Button) findViewById(R.id.eight);
+        mPad9 = (Button) findViewById(R.id.nine);
+        mBack = (Button)findViewById(R.id.back);
 
         mSpiceManager.start(this);
 
@@ -80,12 +123,19 @@ public class GameActivity extends AppCompatActivity {
 
         mFirebase.child("game_" + String.valueOf(mGameId)).addValueEventListener(new gameValueEventListener());
 
-        mNamePlayer1 = (TextView) findViewById(R.id.namePlayer1);
-        mNamePlayer2 = (TextView) findViewById(R.id.namePlayer2);
-        mNamePlayer3 = (TextView) findViewById(R.id.namePlayer3);
-        mStartButton = (Button) findViewById(R.id.start);
-        mSendButton = (Button) findViewById(R.id.send);
-
+        mTimeHandler = new Handler();
+        mTimerRunable = new Runnable() {
+            @Override
+            public void run() {
+                int time =  Integer.parseInt(mTimer.getText().toString());
+                if(time == 0){
+                    timeIsOver();
+                }else {
+                    mTimer.setText(String.valueOf(time - 1));
+                    mTimeHandler.postDelayed(mTimerRunable,1000);
+                }
+            }
+        };
 
         mStartButton.setOnClickListener(new StartGameOnClickListener());
 
@@ -100,6 +150,20 @@ public class GameActivity extends AppCompatActivity {
                 mNamePlayer3.setText(mPlayerName);
                 break;
         }
+
+        mPad0.setOnClickListener(mPadButtonOnClickListener);
+        mPad1.setOnClickListener(mPadButtonOnClickListener);
+        mPad2.setOnClickListener(mPadButtonOnClickListener);
+        mPad3.setOnClickListener(mPadButtonOnClickListener);
+        mPad4.setOnClickListener(mPadButtonOnClickListener);
+        mPad5.setOnClickListener(mPadButtonOnClickListener);
+        mPad6.setOnClickListener(mPadButtonOnClickListener);
+        mPad7.setOnClickListener(mPadButtonOnClickListener);
+        mPad8.setOnClickListener(mPadButtonOnClickListener);
+        mPad9.setOnClickListener(mPadButtonOnClickListener);
+        mBack.setOnClickListener(new BackButtonOnClickListener());
+
+        mSendButton.setOnClickListener(new SendButtonOnClickListener());
     }
 
     private class gameValueEventListener implements ValueEventListener{
@@ -180,11 +244,34 @@ public class GameActivity extends AppCompatActivity {
             mSendButton.setVisibility(View.VISIBLE);
             mSendButton.setEnabled(true);
             mCurrentStatus = Game.STATUS_STARTED;
+            startMove();
         }
 
 
     }
 
+
+    private void startMove(){
+        Random random = new Random();
+        int firstOperand = random.nextInt(9);
+        int secondOperand = random.nextInt(9);
+        mFirstOperand.setText(String.valueOf(firstOperand));
+        mSecondOperand.setText(String.valueOf(secondOperand));
+        mResult.setText("");
+        resetTimer();
+    }
+
+    private void resetTimer(){
+        mTimer.setText("10");
+        mTimeHandler.removeCallbacks(mTimerRunable);
+        mTimeHandler.postDelayed(mTimerRunable, 1000);
+    }
+
+    private void timeIsOver(){
+        Toast.makeText(getApplicationContext(),"Time is over!",Toast.LENGTH_SHORT).show();
+        //TODO CREATE AND SEND MOVE
+        startMove();
+    }
 
     private class StartGameOnClickListener implements View.OnClickListener{
         @Override
@@ -208,4 +295,40 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private class PadButtonOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            Button button = (Button) v;
+            mResult.setText(mResult.getText().toString() + button.getText());
+        }
+    }
+
+    private class BackButtonOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            String resultText = mResult.getText().toString();
+            if(! resultText.isEmpty()){
+                mResult.setText(resultText.substring(0, resultText.length()-1));
+            }
+        }
+    }
+
+    private class SendButtonOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            int firstOperand = Integer.parseInt(mFirstOperand.getText().toString());
+            int secondOperand = Integer.parseInt(mSecondOperand.getText().toString());
+            int answer = Integer.parseInt(mResult.getText().toString());
+
+            int operationResult = firstOperand * secondOperand;
+            if (operationResult == answer){
+                Toast.makeText(getApplicationContext(),"BIEN!!!!",Toast.LENGTH_SHORT).show();
+                //TODO CREATE AND SEND MOVE
+                startMove();
+            }else {
+                Toast.makeText(getApplicationContext(),"Burro!!!!",Toast.LENGTH_SHORT).show();
+                mResult.setText("");
+            }
+        }
+    }
 }
