@@ -1,6 +1,8 @@
 package com.wetmaths.wetmaths;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by amenoni on 4/4/16.
@@ -76,4 +78,40 @@ public class Move {
     public void setScoreP3(Integer scoreP3) {
         this.mScoreP3 = scoreP3;
     }
+
+
+    public Map<String,String> toMap(){
+        Map<String,String> map = new HashMap<String, String>();
+
+        if(this.mGame != null){
+            map.put("game_id",String.valueOf(this.mGame.getId()));
+        }
+
+        if(this.mPlayer != null){
+            map.put("player",String.valueOf(this.mPlayer));
+        }
+
+        if(this.mDate != null){
+            map.put("time",mDate.toString());
+        }
+
+        if(this.mValue != null){
+            map.put("value",String.valueOf(mValue));
+        }
+
+        if(this.mScoreP1 != null){
+            map.put("scoreP1",String.valueOf(this.mScoreP1));
+        }
+
+        if(this.mScoreP2 != null){
+            map.put("scoreP2",String.valueOf(this.mScoreP2));
+        }
+
+        if(this.mScoreP3 != null){
+            map.put("scoreP3",String.valueOf(this.mScoreP3));
+        }
+
+        return map;
+    }
+
 }

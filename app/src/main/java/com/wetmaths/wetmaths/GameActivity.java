@@ -22,6 +22,7 @@ import com.octo.android.robospice.request.listener.RequestListener;
 import com.wetmaths.wetmaths.io.network.CurrentGamePostRequest;
 import com.wetmaths.wetmaths.io.network.CurrentGamePutRequest;
 import com.wetmaths.wetmaths.io.network.CurrentGameRequest;
+import com.wetmaths.wetmaths.io.network.MovePostRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ public class GameActivity extends AppCompatActivity {
     private static final String PLAYER_POSITION_EXTRA = "playerPosition";
     private static final String PLAYER_NAME_EXTRA = "playerName";
     private static final String DEVICE_URL_EXTRA = "deviceURL";
+    private static final int TIMER_VALUE = 5;
 
     private Firebase mFirebase;
 
@@ -262,7 +264,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void resetTimer(){
-        mTimer.setText("10");
+        mTimer.setText(String.valueOf(TIMER_VALUE));
         mTimeHandler.removeCallbacks(mTimerRunable);
         mTimeHandler.postDelayed(mTimerRunable, 1000);
     }
@@ -323,12 +325,33 @@ public class GameActivity extends AppCompatActivity {
             int operationResult = firstOperand * secondOperand;
             if (operationResult == answer){
                 Toast.makeText(getApplicationContext(),"BIEN!!!!",Toast.LENGTH_SHORT).show();
-                //TODO CREATE AND SEND MOVE
+                Move move = new Move();
+                move.setGame(mGame);
+                move.setPlayer(mPlayerPosition);
+                move.setValue(TIMER_VALUE - Integer.parseInt(mTimer.getText().toString()));
+
+                MovePostRequest movePostRequest = new MovePostRequest(mDeviceURL,move);
+                mSpiceManager.execute(movePostRequest,new MovePostRequestListener());
+
                 startMove();
             }else {
-                Toast.makeText(getApplicationContext(),"Burro!!!!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Cuak",Toast.LENGTH_SHORT).show();
                 mResult.setText("");
             }
         }
     }
+
+    private class MovePostRequestListener implements RequestListener<Boolean>{
+        @Override
+        public void onRequestSuccess(Boolean aBoolean) {
+
+        }
+
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            Toast.makeText(getApplicationContext(),"Request Faliure",Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
 }
