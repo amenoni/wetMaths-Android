@@ -64,7 +64,7 @@
             android:id="@+id/scorePlayer1"
             android:layout_weight="1"
             android:textAlignment="center"
-            android:background="@color/red"
+            android:background="@color/green"
             />
 
         <TextView

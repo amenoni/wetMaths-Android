@@ -1,5 +1,9 @@
 package com.wetmaths.wetmaths;
 
+import android.util.Log;
+
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,16 +16,35 @@ public class Move {
     public static final Integer FIRST_PLAYER = 1;
     public static final Integer SECOND_PLAYER = 2;
     public static final Integer THIRD_PLAYER = 3;
+    private static final String TAG = "Move";
 
     private Game mGame;
     private Integer mPlayer;
-    private Date mDate;
+    private String mDate;
     private Integer mValue;
     private Integer mScoreP1;
     private Integer mScoreP2;
     private Integer mScoreP3;
 
+    public Move(){
+    }
 
+    public Move(Game game,JSONObject moveJson) {
+        this.setGame(game);
+        try {
+            this.setPlayer(moveJson.getInt("player"));
+            this.setDate(moveJson.getString("time"));
+            this.setValue(moveJson.getInt("value"));
+            this.setScoreP1(moveJson.getInt("scoreP1"));
+            this.setScoreP2(moveJson.getInt("scoreP2"));
+            this.setScoreP3(moveJson.getInt("scoreP3"));
+        }catch (Exception e){
+            Log.e(TAG,e.getMessage());
+        }
+
+
+
+    }
 
     public Game getGame() {
         return mGame;
@@ -31,7 +54,7 @@ public class Move {
         return mPlayer;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return mDate;
     }
 
@@ -59,7 +82,7 @@ public class Move {
         this.mPlayer = player;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.mDate = date;
     }
 
@@ -92,7 +115,7 @@ public class Move {
         }
 
         if(this.mDate != null){
-            map.put("time",mDate.toString());
+            map.put("time",mDate);
         }
 
         if(this.mValue != null){

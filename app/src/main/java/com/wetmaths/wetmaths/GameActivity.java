@@ -2,6 +2,7 @@ package com.wetmaths.wetmaths;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,8 @@ import com.wetmaths.wetmaths.io.network.MovePostRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -37,6 +40,8 @@ public class GameActivity extends AppCompatActivity {
     private static final String PLAYER_NAME_EXTRA = "playerName";
     private static final String DEVICE_URL_EXTRA = "deviceURL";
     private static final int TIMER_VALUE = 5;
+    public static final String FIREBASE_GAME_KEY = "game_update";
+    public static final String FIREBASE_MOVE_KEY = "moves";
 
     private Firebase mFirebase;
 
@@ -49,6 +54,10 @@ public class GameActivity extends AppCompatActivity {
     private TextView mSecondOperand;
     private TextView mTimer;
     private TextView mResult;
+    private TextView mScorePlayer1;
+    private TextView mScorePlayer2;
+    private TextView mScorePlayer3;
+    private ArrayList<TextView> mScoreBoard;
     private Button mStartButton;
     private Button mSendButton;
     private Button mPad0;
@@ -104,6 +113,13 @@ public class GameActivity extends AppCompatActivity {
         mSecondOperand = (TextView) findViewById(R.id.secondOperand);
         mTimer = (TextView) findViewById(R.id.timer);
         mResult = (TextView) findViewById(R.id.result);
+        mScorePlayer1 = (TextView) findViewById(R.id.scorePlayer1);
+        mScorePlayer2 = (TextView) findViewById(R.id.scorePlayer2);
+        mScorePlayer3 = (TextView) findViewById(R.id.scorePlayer3);
+        mScoreBoard = new ArrayList<TextView>();
+        mScoreBoard.add(mScorePlayer1);
+        mScoreBoard.add(mScorePlayer2);
+        mScoreBoard.add(mScorePlayer3);
         mStartButton = (Button) findViewById(R.id.start);
         mSendButton = (Button) findViewById(R.id.send);
         mPad0 = (Button) findViewById(R.id.zero);
@@ -194,9 +210,17 @@ public class GameActivity extends AppCompatActivity {
                         try {
                             JSONArray jsonArray = new JSONArray(secondChild.getValue().toString());
                             JSONObject object = jsonArray.getJSONObject(0);
-                            JSONObject gameJson = (JSONObject) object.get("fields");
-                            gameJson.put("pk",object.get("pk"));
-                            ProcessGameUpdate(gameJson);
+                            JSONObject json = (JSONObject) object.get("fields");
+                            json.put("pk",object.get("pk"));
+                            switch (ChildrenKey){
+                                case FIREBASE_GAME_KEY:
+                                    ProcessGameUpdate(json);
+                                    break;
+                                case FIREBASE_MOVE_KEY:
+                                    ProcessMoveUpdate(json);
+                                    break;
+                            }
+
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -252,6 +276,15 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
+    private void ProcessMoveUpdate(JSONObject moveJson){
+        Move move = new Move(mGame,moveJson);
+        this.mScorePlayer1.setText(move.getScoreP1().toString());
+        this.mScorePlayer2.setText(move.getScoreP2().toString());
+        this.mScorePlayer3.setText(move.getScoreP3().toString());
+        UpdateScoreBoard();
+
+    }
+
 
     private void startMove(){
         Random random = new Random();
@@ -271,7 +304,12 @@ public class GameActivity extends AppCompatActivity {
 
     private void timeIsOver(){
         Toast.makeText(getApplicationContext(),"Time is over!",Toast.LENGTH_SHORT).show();
-        //TODO CREATE AND SEND MOVE
+        Move move = new Move();
+        move.setGame(mGame);
+        move.setPlayer(mPlayerPosition);
+        move.setValue(TIMER_VALUE);
+        MovePostRequest movePostRequest = new MovePostRequest(mDeviceURL,move);
+        mSpiceManager.execute(movePostRequest,new MovePostRequestListener());
         startMove();
     }
 
@@ -351,6 +389,17 @@ public class GameActivity extends AppCompatActivity {
         public void onRequestFailure(SpiceException spiceException) {
             Toast.makeText(getApplicationContext(),"Request Faliure",Toast.LENGTH_SHORT).show();
 
+        }
+    }
+
+    private void UpdateScoreBoard(){
+        for (TextView textView : mScoreBoard){
+            int score = Integer.parseInt(textView.getText().toString());
+            if (score <= 0){
+                textView.setBackgroundColor(Color.RED);
+            }else if (score <= 20){
+                textView.setBackgroundColor(Color.YELLOW);
+            }
         }
     }
 
