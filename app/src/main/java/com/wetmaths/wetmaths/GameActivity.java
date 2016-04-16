@@ -247,7 +247,7 @@ public class GameActivity extends AppCompatActivity {
         mNamePlayer3.setText(mGame.getPlayer3());
 
         if(mGame.getStatus().equals(Game.STATUS_FINISHED)){
-            this.finish();
+            endGame();
         }else if (mCurrentStatus.equals(Game.STATUS_NOT_STARTED)){
             //I am the first player?
             if(mPlayerName.equals(mGame.getPlayer1())){
@@ -283,6 +283,11 @@ public class GameActivity extends AppCompatActivity {
         this.mScorePlayer3.setText(move.getScoreP3().toString());
         UpdateScoreBoard();
 
+        //If this player lose we finish the activity
+        if (Integer.parseInt(mScoreBoard.get(mPlayerPosition-1).getText().toString()) <= 0){
+            endGame();
+        }
+
     }
 
 
@@ -303,11 +308,10 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void timeIsOver(){
-        Toast.makeText(getApplicationContext(),"Time is over!",Toast.LENGTH_SHORT).show();
         Move move = new Move();
         move.setGame(mGame);
         move.setPlayer(mPlayerPosition);
-        move.setValue(TIMER_VALUE);
+        move.setValue(TIMER_VALUE * 3);
         MovePostRequest movePostRequest = new MovePostRequest(mDeviceURL,move);
         mSpiceManager.execute(movePostRequest,new MovePostRequestListener());
         startMove();
@@ -356,25 +360,27 @@ public class GameActivity extends AppCompatActivity {
     private class SendButtonOnClickListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            int firstOperand = Integer.parseInt(mFirstOperand.getText().toString());
-            int secondOperand = Integer.parseInt(mSecondOperand.getText().toString());
-            int answer = Integer.parseInt(mResult.getText().toString());
+            if(!mResult.getText().toString().isEmpty()){
+                int firstOperand = Integer.parseInt(mFirstOperand.getText().toString());
+                int secondOperand = Integer.parseInt(mSecondOperand.getText().toString());
+                int answer = Integer.parseInt(mResult.getText().toString());
 
-            int operationResult = firstOperand * secondOperand;
-            if (operationResult == answer){
-                Toast.makeText(getApplicationContext(),"BIEN!!!!",Toast.LENGTH_SHORT).show();
-                Move move = new Move();
-                move.setGame(mGame);
-                move.setPlayer(mPlayerPosition);
-                move.setValue(TIMER_VALUE - Integer.parseInt(mTimer.getText().toString()));
+                int operationResult = firstOperand * secondOperand;
+                if (operationResult == answer){
+                    Toast.makeText(getApplicationContext(),"BIEN!!!!",Toast.LENGTH_SHORT).show();
+                    Move move = new Move();
+                    move.setGame(mGame);
+                    move.setPlayer(mPlayerPosition);
+                    move.setValue(TIMER_VALUE - Integer.parseInt(mTimer.getText().toString()));
 
-                MovePostRequest movePostRequest = new MovePostRequest(mDeviceURL,move);
-                mSpiceManager.execute(movePostRequest,new MovePostRequestListener());
+                    MovePostRequest movePostRequest = new MovePostRequest(mDeviceURL,move);
+                    mSpiceManager.execute(movePostRequest,new MovePostRequestListener());
 
-                startMove();
-            }else {
-                Toast.makeText(getApplicationContext(),"Cuak",Toast.LENGTH_SHORT).show();
-                mResult.setText("");
+                    startMove();
+                }else {
+                    Toast.makeText(getApplicationContext(),"Cuak",Toast.LENGTH_SHORT).show();
+                    mResult.setText("");
+                }
             }
         }
     }
@@ -403,4 +409,8 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private void endGame(){
+        mTimeHandler.removeCallbacks(mTimerRunable);
+        finish();
+    }
 }
