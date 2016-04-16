@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 mGame.setStarted_at(sdf.format(date));
                 mGame.setStatus("n");
-                mGame.setPlayer1(mPlayerName.getText().toString());
+                mGame.setPlayer1(mPlayerName.getText().toString().replace(" ",""));
 
                 mPlayerPosition = 1;
 
@@ -119,10 +119,10 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
            if(v.getId() == R.id.set_p2){
                mPlayerPosition = 2;
-               mGame.setPlayer2(mPlayerName.getText().toString());
+               mGame.setPlayer2(mPlayerName.getText().toString().replace(" ",""));
            }else if(v.getId() == R.id.set_p3){
                mPlayerPosition = 3;
-               mGame.setPlayer3(mPlayerName.getText().toString());
+               mGame.setPlayer3(mPlayerName.getText().toString().replace(" ",""));
            }
             //CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
             //mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                 mGame = game;
                 //Start game activity
                 GameActivity gameActivity = new GameActivity();
-                Intent gameIntent = gameActivity.newIntent(getApplicationContext(), mGame, mPlayerName.getText().toString(), mPlayerPosition,mDeviceUrl.getText().toString());
+                Intent gameIntent = gameActivity.newIntent(getApplicationContext(), mGame, mPlayerName.getText().toString().replace(" ",""), mPlayerPosition,mDeviceUrl.getText().toString());
                 startActivity(gameIntent);
             }
 
