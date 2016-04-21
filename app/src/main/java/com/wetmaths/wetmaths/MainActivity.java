@@ -1,5 +1,6 @@
 package com.wetmaths.wetmaths;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.wetmaths.wetmaths.io.network.CurrentGamePostRequest;
+import com.wetmaths.wetmaths.io.network.CurrentGamePutRequest;
 import com.wetmaths.wetmaths.io.network.CurrentGameRequest;
 import com.wetmaths.wetmaths.io.network.GameListRequest;
 
@@ -37,10 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private Button mCreateNewGame;
     private Button mSetAsPlayer2;
     private Button mSetAsPlayer3;
-    private Firebase mFirebase;
+
     protected SpiceManager mSpiceManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
 
-    Game mGame;
+    private Game mGame;
+    private int mPlayerPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,24 +62,8 @@ public class MainActivity extends AppCompatActivity {
         mSetAsPlayer3 = (Button) findViewById(R.id.set_p3);
         mSetAsPlayer3.setOnClickListener(new SetPlayerAsButtonOnClickListener());
 
-        Firebase.setAndroidContext(this);
-        mFirebase = new Firebase("https://resplendent-torch-6152.firebaseio.com/");
-
 
         mSpiceManager.start(this);
-
-
-        mFirebase.child("mensaje").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Toast.makeText(getApplicationContext(), "Valor: " + dataSnapshot.getValue(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
 
         mPerformRequestbtn.setOnClickListener(new ConnectButtonOnClicListener());
         mCreateNewGame.setOnClickListener(new CreateGameButtonOnClickListener());
@@ -90,6 +77,77 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+    private class ConnectButtonOnClicListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            if(!mDeviceUrl.getText().toString().isEmpty() && !mPlayerName.getText().toString().isEmpty()){
+                CurrentGameRequest currentGameRequest = new CurrentGameRequest(mDeviceUrl.getText().toString());
+                mSpiceManager.execute(currentGameRequest,new ListGamesRequestListener());
+            }else {
+                Toast.makeText(getApplicationContext(),"You must enter the device url and player name first",Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
+    private class CreateGameButtonOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            if(!mDeviceUrl.getText().toString().isEmpty() && !mPlayerName.getText().toString().isEmpty()){
+                mGame = new Game();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                mGame.setStarted_at(sdf.format(date));
+                mGame.setStatus("n");
+                mGame.setPlayer1(mPlayerName.getText().toString().replace(" ",""));
+
+                mPlayerPosition = 1;
+
+                CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
+                mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
+            }else {
+                Toast.makeText(getApplicationContext(),"You must enter the device url and player name first",Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private class SetPlayerAsButtonOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+           if(v.getId() == R.id.set_p2){
+               mPlayerPosition = 2;
+               mGame.setPlayer2(mPlayerName.getText().toString().replace(" ",""));
+           }else if(v.getId() == R.id.set_p3){
+               mPlayerPosition = 3;
+               mGame.setPlayer3(mPlayerName.getText().toString().replace(" ",""));
+           }
+            //CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
+            //mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
+            CurrentGamePutRequest currentGamePutRequest = new CurrentGamePutRequest(mDeviceUrl.getText().toString(),mGame);
+            mSpiceManager.execute(currentGamePutRequest,new GamesPostRequestListener());
+        }
+    }
+
+    private class GamesPostRequestListener implements RequestListener<Boolean>{
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onRequestSuccess(Boolean result) {
+            if (result){
+                CurrentGameRequest currentGameRequest = new CurrentGameRequest(mDeviceUrl.getText().toString());
+                mSpiceManager.execute(currentGameRequest,new GameCreatedRequestListener());
+
+            }else {
+                Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     private class ListGamesRequestListener implements RequestListener<GameList>{
 
@@ -139,67 +197,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class ConnectButtonOnClicListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            if(!mDeviceUrl.getText().toString().isEmpty() && !mPlayerName.getText().toString().isEmpty()){
-                CurrentGameRequest currentGameRequest = new CurrentGameRequest(mDeviceUrl.getText().toString());
-                mSpiceManager.execute(currentGameRequest,new ListGamesRequestListener());
-            }else {
-                Toast.makeText(getApplicationContext(),"You must enter the device url and player name first",Toast.LENGTH_LONG).show();
-            }
-
-        }
-    }
-
-    private class CreateGameButtonOnClickListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            if(!mDeviceUrl.getText().toString().isEmpty() && !mPlayerName.getText().toString().isEmpty()){
-                mGame = new Game();
-                //TODO set the started_at attribute to now
-                Calendar calendar = Calendar.getInstance();
-                Date date = calendar.getTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                mGame.setStarted_at(sdf.format(date));
-                mGame.setStatus("n");
-                mGame.setPlayer1(mPlayerName.getText().toString());
-
-                CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
-                mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
-            }else {
-                Toast.makeText(getApplicationContext(),"You must enter the device url and player name first",Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private class SetPlayerAsButtonOnClickListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-           if(v.getId() == R.id.set_p2){
-               mGame.setPlayer2(mPlayerName.getText().toString());
-           }else if(v.getId() == R.id.set_p3){
-               mGame.setPlayer3(mPlayerName.getText().toString());
-           }
-            CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
-            mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
-
-        }
-    }
-
-    private class GamesPostRequestListener implements RequestListener<Boolean>{
+    private class GameCreatedRequestListener implements RequestListener<GameList>{
         @Override
         public void onRequestFailure(SpiceException spiceException) {
             Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public void onRequestSuccess(Boolean result) {
-            if (result){
-                //TODO Here we must start the game activity
-            }else {
-                Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+        public void onRequestSuccess(GameList gamelist) {
+            if( !gamelist.getGames().isEmpty()){
+                Game game = gamelist.getGames().get(0);
+                mGame = game;
+                //Start game activity
+                GameActivity gameActivity = new GameActivity();
+                Intent gameIntent = gameActivity.newIntent(getApplicationContext(), mGame, mPlayerName.getText().toString().replace(" ",""), mPlayerPosition,mDeviceUrl.getText().toString());
+                startActivity(gameIntent);
             }
+
+
         }
     }
+
+
 }

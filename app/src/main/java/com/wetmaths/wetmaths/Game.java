@@ -2,8 +2,10 @@ package com.wetmaths.wetmaths;
 
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +18,12 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
 
+    private final static String TAG = "Game";
+
+    public final static String STATUS_FINISHED = "f";
+    public final static String STATUS_NOT_STARTED = "n";
+    public final static String STATUS_STARTED = "s";
+
     private int id;
     private String player1;
     private String player2;
@@ -25,6 +33,26 @@ public class Game {
     private String status;
     private String winner;
 
+
+    public Game(){
+
+    }
+
+    public Game(JSONObject gameJson) {
+        try {
+            this.setId(gameJson.getInt("pk"));
+            this.setPlayer1(gameJson.getString("player1"));
+            this.setPlayer2(gameJson.getString("player2"));
+            this.setPlayer3(gameJson.getString("player3"));
+            this.setStarted_at(gameJson.getString("started_at"));
+            this.setEnded_at(gameJson.getString("ended_at"));
+            this.setWinner(gameJson.getString("winner"));
+            this.setStatus(gameJson.getString("status"));
+
+        }catch (Exception e){
+            Log.e(TAG,e.getMessage());
+        }
+    }
 
     public int getId() {
         return id;
@@ -94,38 +122,56 @@ public class Game {
     public Map<String,String> toMap(){
         Map<String,String> map = new HashMap<String,String>();
         if(this.id != 0){
-            map.put("id",String.valueOf(this.id));
+            map.put("pk",String.valueOf(this.id));
         }
 
         if(this.started_at != null){
-            map.put("started_at",this.started_at);
+            if(!this.started_at.equals("null")){
+                map.put("started_at",this.started_at);
+            }
+
         }
 
         if(this.player1 != null){
-            map.put("player1",this.player1);
+            if(!this.player1.equals("null")){
+                map.put("player1",this.player1);
+            }
         }
 
         if(player2 != null){
-            map.put("player2",this.player2);
+            if(!this.player2.equals("null")){
+                map.put("player2",this.player2);
+            }
         }
 
         if (player3 != null){
-            map.put("player3",this.player3);
+            if(!this.player3.equals("null")){
+                map.put("player3",this.player3);
+            }
         }
 
         if (ended_at != null){
-            map.put("ended_at",this.ended_at);
+            if (!this.ended_at.equals("null")){
+                map.put("ended_at",this.ended_at);
+            }
+
         }
 
         if(status != null){
-            map.put("status",this.status);
+            if(!this.status.equals("null")){
+                map.put("status",this.status);
+            }
         }
 
         if(winner != null){
-            map.put("winner",this.winner);
+            if(!this.winner.equals("null")){
+                map.put("winner",this.winner);
+            }
+
         }
 
 
         return map;
     }
+
 }
