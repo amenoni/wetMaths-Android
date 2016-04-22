@@ -39,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private Button mCreateNewGame;
     private Button mSetAsPlayer2;
     private Button mSetAsPlayer3;
+    private TextView mFirstPlayer;
+    private TextView mSecondPlayer;
+    private TextView mThirdPlayer;
 
     protected SpiceManager mSpiceManager = new SpiceManager(JacksonSpringAndroidSpiceService.class);
 
@@ -61,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
         mSetAsPlayer2.setOnClickListener(new SetPlayerAsButtonOnClickListener());
         mSetAsPlayer3 = (Button) findViewById(R.id.set_p3);
         mSetAsPlayer3.setOnClickListener(new SetPlayerAsButtonOnClickListener());
-
+        mFirstPlayer = (TextView) findViewById(R.id.firstPlayerName);
+        mSecondPlayer = (TextView) findViewById(R.id.secondPlayerName);
+        mThirdPlayer = (TextView) findViewById(R.id.thirdPlayerName);
 
         mSpiceManager.start(this);
 
@@ -76,12 +81,20 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
-
+    private void CleanScrean(){
+        this.mCreateGame.setVisibility(View.GONE);
+        this.mGameId.setText("");
+        this.mFirstPlayer.setText("");
+        this.mSecondPlayer.setText("");
+        this.mThirdPlayer.setText("");
+        this.mJoinGame.setVisibility(View.GONE);
+    }
 
 
     private class ConnectButtonOnClicListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
+            CleanScrean();
             if(!mDeviceUrl.getText().toString().isEmpty() && !mPlayerName.getText().toString().isEmpty()){
                 CurrentGameRequest currentGameRequest = new CurrentGameRequest(mDeviceUrl.getText().toString());
                 mSpiceManager.execute(currentGameRequest,new ListGamesRequestListener());
@@ -108,8 +121,9 @@ public class MainActivity extends AppCompatActivity {
 
                 CurrentGamePostRequest currentGamePostRequest = new CurrentGamePostRequest(mDeviceUrl.getText().toString(),mGame);
                 mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
+                CleanScrean();
             }else {
-                Toast.makeText(getApplicationContext(),"You must enter the device url and player name first",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),getString(R.string.enterNameAndUrl),Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -128,13 +142,14 @@ public class MainActivity extends AppCompatActivity {
             //mSpiceManager.execute(currentGamePostRequest,new GamesPostRequestListener());
             CurrentGamePutRequest currentGamePutRequest = new CurrentGamePutRequest(mDeviceUrl.getText().toString(),mGame);
             mSpiceManager.execute(currentGamePutRequest,new GamesPostRequestListener());
+            CleanScrean();
         }
     }
 
     private class GamesPostRequestListener implements RequestListener<Boolean>{
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),getString(R.string.request_faliure),Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -144,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 mSpiceManager.execute(currentGameRequest,new GameCreatedRequestListener());
 
             }else {
-                Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),getString(R.string.request_faliure),Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -153,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),getString(R.string.request_faliure),Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -168,26 +183,24 @@ public class MainActivity extends AppCompatActivity {
                 Game game = gamelist.getGames().get(0);
                 mCreateGame.setVisibility(View.GONE);
                 mJoinGame.setVisibility(View.VISIBLE);
-                TextView firstPlayer = (TextView) findViewById(R.id.firstPlayerName);
-                TextView secondPlayer = (TextView) findViewById(R.id.secondPlayerName);
-                TextView thirdPlayer = (TextView) findViewById(R.id.thirdPlayerName);
+
 
 
 
                 mGame = game;
 
                 mGameId.setText(String.valueOf(mGame.getId()));
-                firstPlayer.setText(mGame.getPlayer1());
+                mFirstPlayer.setText(mGame.getPlayer1());
                 if(mGame.getPlayer2().isEmpty()){
                     mSetAsPlayer2.setVisibility(View.VISIBLE);
                 }else {
-                    secondPlayer.setText(mGame.getPlayer2());
+                    mSecondPlayer.setText(mGame.getPlayer2());
                 }
 
                 if(mGame.getPlayer3().isEmpty()){
                     mSetAsPlayer3.setVisibility(View.VISIBLE);
                 }else {
-                    thirdPlayer.setText(mGame.getPlayer3());
+                    mThirdPlayer.setText(mGame.getPlayer3());
                 }
 
 
@@ -200,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
     private class GameCreatedRequestListener implements RequestListener<GameList>{
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Toast.makeText(getApplicationContext(),"Request faliure",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),getString(R.string.request_faliure),Toast.LENGTH_SHORT).show();
         }
 
         @Override

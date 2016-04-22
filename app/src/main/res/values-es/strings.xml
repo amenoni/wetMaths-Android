@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">wetmaths</string>
+    <string name="connect">Conectar y buscar juegos</string>
+    <string name="create_new_game">Crear nuevo juego</string>
+    <string name="device_url">URL Dispositivo</string>
+    <string name="enter_as_p2">Entrar como jugador 1</string>
+    <string name="enter_as_p3">Entrar como jugador 3</string>
+    <string name="first_player">Primer jugador</string>
+    <string name="game_id">ID del juego</string>
+    <string name="no_current_games">No se encontraron juegos</string>
+    <string name="player_name">Nombre del jugador</string>
+    <string name="second_player">Segundo jugador</string>
+    <string name="third_player">Tercer jugador</string>
+    <string name="your_name">Tu nombre</string>
+    <string name="backspace">Borrar</string>
+    <string name="nice">Bien!</string>
+    <string name="player1">Jugador 1</string>
+    <string name="player2">Jugador 2</string>
+    <string name="player3">Jugador 3</string>
+    <string name="request_faliure">Fallo la petición</string>
+    <string name="score">Puntaje</string>
+    <string name="send">Enviar</string>
+    <string name="start">Comenzar!</string>
+    <string name="enterNameAndUrl">Primero debes ingresar tu nombre y la URL del dispositivo</string>
+</resources>
