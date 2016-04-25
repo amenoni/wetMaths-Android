@@ -330,7 +330,7 @@ public class GameActivity extends AppCompatActivity {
     private class GamesPutRequestListener implements RequestListener<Boolean> {
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Toast.makeText(getApplicationContext(), "Request faliure", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.request_faliure), Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -367,7 +367,7 @@ public class GameActivity extends AppCompatActivity {
 
                 int operationResult = firstOperand * secondOperand;
                 if (operationResult == answer){
-                    Toast.makeText(getApplicationContext(),"BIEN!!!!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.nice),Toast.LENGTH_SHORT).show();
                     Move move = new Move();
                     move.setGame(mGame);
                     move.setPlayer(mPlayerPosition);
@@ -378,7 +378,7 @@ public class GameActivity extends AppCompatActivity {
 
                     startMove();
                 }else {
-                    Toast.makeText(getApplicationContext(),"Cuak",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),getString(R.string.wrong),Toast.LENGTH_SHORT).show();
                     mResult.setText("");
                 }
             }
@@ -393,7 +393,7 @@ public class GameActivity extends AppCompatActivity {
 
         @Override
         public void onRequestFailure(SpiceException spiceException) {
-            Toast.makeText(getApplicationContext(),"Request Faliure",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),getString(R.string.request_faliure),Toast.LENGTH_SHORT).show();
 
         }
     }

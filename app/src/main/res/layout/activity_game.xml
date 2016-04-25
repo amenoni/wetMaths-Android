@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Player 1"
+            android:text="@string/player1"
             android:id="@+id/namePlayer1"
             android:layout_weight="1"
             android:textAlignment="center"
@@ -32,7 +32,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Player 2 "
+            android:text="@string/player2"
             android:layout_weight="1"
             android:id="@+id/namePlayer2"
             android:textAlignment="center"/>
@@ -40,7 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Player 3 "
+            android:text="@string/player3"
             android:layout_weight="1"
             android:id="@+id/namePlayer3"
             android:textAlignment="center"/>
@@ -59,7 +59,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score"
+            android:text="@string/score"
             android:textSize="15dp"
             android:id="@+id/scorePlayer1"
             android:layout_weight="1"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
-            android:text="Score"
+            android:text="@string/score"
             android:id="@+id/scorePlayer2"
             android:layout_weight="1"
             android:textAlignment="center"
@@ -82,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
-            android:text="Score"
+            android:text="@string/score"
             android:id="@+id/scorePlayer3"
             android:layout_weight="1"
             android:textAlignment="center"
@@ -167,7 +167,7 @@
             android:id="@+id/send"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Send"
+            android:text="@string/send"
             android:background="@color/green"
             android:enabled="false"
             android:visibility="gone"/>
@@ -175,7 +175,7 @@
             android:id="@+id/start"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:text="Start!"
+            android:text="@string/start"
             android:background="@color/green"
             android:enabled="false"
             android:visibility="visible"/>/>
@@ -291,7 +291,7 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="back"
+            android:text="@string/backspace"
             android:id="@+id/back"/>
     </LinearLayout>
 
