@@ -22,3 +22,11 @@ el diseño de las piezas impresas en 3D para el harware.
 https://github.com/amenoni/wetMaths-Arduino
 
 ![alt tag](https://github.com/amenoni/wetMaths-Android/blob/master/screenshot_es.png)
+
+Herramientas integradas
+
+Firebase tutorial
+https://www.firebase.com/docs/android/quickstart.html
+
+RoboSpice Tutorial
+https://github.com/stephanenicolas/robospice/wiki/Starter-guide
