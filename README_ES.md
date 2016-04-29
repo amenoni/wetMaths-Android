@@ -5,7 +5,8 @@
 Consiste en 3 jugadores usando una aplicación Android y un dispositivo basado en arduino Yun el cual 
 disparara un poco de espuma de cotillon a los jugadores que pierdan la partida en el juego.
 
-#LINK A YOUTUBE
+##Demo Video
+[![WetMaths Demo](https://img.youtube.com/vi/A47k1j1MHRI/0.jpg)](https://www.youtube.com/watch?v=A47k1j1MHRI)
 
 En este repositorio encontramos el código de la aplicación Android.
 Si no desea compilar la aplicación puede descargar el apk e instalarlo en su dispositivo.
