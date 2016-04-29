@@ -6,7 +6,8 @@ Spanish [readme](https://github.com/amenoni/wetMaths-Android/blob/master/README_
 
 3 Players using an Android App and a Arduino Based device that will launch a little party foam spray to the player that loses
 
-# ADD LINK TO YOUTUBE
+##Demo Video
+[![WetMaths Demo](https://img.youtube.com/vi/A47k1j1MHRI/0.jpg)](https://www.youtube.com/watch?v=A47k1j1MHRI)
 
 In this repo you will find the code for the Android App.
 If you dont wont to download and compile this code you can directly download and install the latest APK
